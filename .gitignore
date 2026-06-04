@@ -1,0 +1,14 @@
+build/
+test/
+tmp/
+
+# asset 由来のビルド派生物 (= make で再生成されるので git track しない)。
+#   assets/font.png        : Press Start 2P TTF (OFL-1.1) から make 生成
+#   assets/src/font_data.s 等 : asset から生成された ASM ソース
+# リポジトリ側でフォント派生物を再頒布しないことで OFL のライセンス全文
+# 同梱義務を回避する設計。 詳細は docs/FONT.md。
+assets/font.png
+assets/src/
+
+# Python キャッシュ
+__pycache__/

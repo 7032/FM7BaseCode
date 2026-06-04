@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 360" font-family="-apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif">
+  <defs>
+    <marker id="cah" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#57606a"/></marker>
+  </defs>
+  <rect x="0" y="0" width="820" height="360" rx="8" fill="#f6f8fa"/>
+
+  <!-- inputs -->
+  <g font-size="12.5" fill="#1f2328" text-anchor="middle">
+    <rect x="20" y="30"  width="150" height="52" rx="6" fill="#eef4fb" stroke="#0969da" stroke-width="1.5"/>
+    <text x="95" y="52">C ソース</text><text x="95" y="70" font-size="11" fill="#57606a">c_main.c ほか</text>
+    <rect x="20" y="124" width="150" height="52" rx="6" fill="#eef4fb" stroke="#0969da" stroke-width="1.5"/>
+    <text x="95" y="146">6809 ASM</text><text x="95" y="164" font-size="11" fill="#57606a">asm_*.s</text>
+    <rect x="20" y="218" width="150" height="52" rx="6" fill="#eef4fb" stroke="#0969da" stroke-width="1.5"/>
+    <text x="95" y="240">アセット PNG</text><text x="95" y="258" font-size="11" fill="#57606a">キャラ・背景・font</text>
+  </g>
+
+  <!-- objects -->
+  <rect x="262" y="124" width="120" height="52" rx="6" fill="#ffffff" stroke="#57606a" stroke-width="1.5"/>
+  <text x="322" y="155" text-anchor="middle" font-size="13" fill="#1f2328">.o オブジェクト</text>
+
+  <!-- BIN -->
+  <rect x="448" y="124" width="120" height="52" rx="6" fill="#eafaef" stroke="#1a7f37" stroke-width="1.5"/>
+  <text x="508" y="148" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2328">本体 BIN</text>
+  <text x="508" y="166" text-anchor="middle" font-size="11" fill="#57606a">$0400</text>
+
+  <!-- IPL -->
+  <rect x="448" y="40" width="120" height="46" rx="6" fill="#ffffff" stroke="#57606a" stroke-width="1.5"/>
+  <text x="508" y="68" text-anchor="middle" font-size="13" fill="#1f2328">IPL</text>
+
+  <!-- D77 -->
+  <rect x="636" y="92" width="150" height="56" rx="6" fill="#fff5e6" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="711" y="116" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1f2328">D77 イメージ</text>
+  <text x="711" y="135" text-anchor="middle" font-size="11" fill="#57606a">エミュレータで起動</text>
+
+  <!-- HFE -->
+  <rect x="636" y="200" width="150" height="52" rx="6" fill="#f3eefb" stroke="#8250df" stroke-width="1.5"/>
+  <text x="711" y="224" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1f2328">HFE イメージ</text>
+  <text x="711" y="242" text-anchor="middle" font-size="11" fill="#57606a">MFM 変換</text>
+
+  <!-- arrows -->
+  <g stroke="#57606a" stroke-width="1.7" marker-end="url(#cah)" fill="none">
+    <path d="M170,56 C220,56 220,140 262,148"/>
+    <path d="M170,150 H262"/>
+    <path d="M170,244 C220,244 220,160 262,154"/>
+    <path d="M382,150 H448" />
+    <path d="M508,86 V124"/>
+    <path d="M568,150 C600,150 600,122 636,118"/>
+    <path d="M711,148 V200"/>
+  </g>
+  <text x="215" y="100" font-size="11" fill="#57606a" text-anchor="middle">CMOC</text>
+  <text x="215" y="135" font-size="11" fill="#57606a" text-anchor="middle">LWASM</text>
+  <text x="215" y="208" font-size="11" fill="#57606a" text-anchor="middle">変換script</text>
+  <text x="408" y="142" font-size="11" fill="#57606a" text-anchor="middle">LWLINK</text>
+  <text x="600" y="100" font-size="11" fill="#57606a" text-anchor="middle">bin2d77</text>
+  <text x="744" y="180" font-size="11" fill="#57606a" text-anchor="middle">d77_to_hfe</text>
+</svg>

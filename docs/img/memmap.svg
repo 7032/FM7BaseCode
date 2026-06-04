@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 510" font-family="-apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif">
+  <rect x="0" y="0" width="580" height="510" rx="8" fill="#f6f8fa"/>
+  <text x="150" y="28" font-size="15" font-weight="700" fill="#1f2328">メモリマップ (FM-7 / 本体 ORG=$0400)</text>
+
+  <!-- bands: x=150 w=240 -->
+  <g stroke="#8c959f" stroke-width="1.2">
+    <rect x="150" y="40"  width="240" height="40"  fill="#eaeef2"/>
+    <rect x="150" y="80"  width="240" height="50"  fill="#eef4fb"/>
+    <rect x="150" y="130" width="240" height="150" fill="#eafaef"/>
+    <rect x="150" y="280" width="240" height="36"  fill="#f6f8fa"/>
+    <rect x="150" y="316" width="240" height="44"  fill="#fff5e6"/>
+    <rect x="150" y="360" width="240" height="60"  fill="#fdeef0"/>
+    <rect x="150" y="420" width="240" height="50"  fill="#f3eefb"/>
+  </g>
+
+  <!-- region labels -->
+  <g font-size="13" fill="#1f2328" text-anchor="middle">
+    <text x="270" y="64">ダイレクトページ / システム</text>
+    <text x="270" y="109">IPL ロード域 (BASIC=$0100 / DOS=$0300)</text>
+    <text x="270" y="200" font-weight="700">本体プログラム</text>
+    <text x="270" y="222" font-size="12" fill="#57606a">crt0 + main + サブシステムヘルパ</text>
+    <text x="270" y="302" font-size="12" fill="#57606a">マージン (空き)</text>
+    <text x="270" y="342">IPL relocate 先</text>
+    <text x="270" y="386">I/O ・ 共有 RAM</text>
+    <text x="270" y="404" font-size="11.5" fill="#57606a">($FC80–$FCFF = 共有 RAM)</text>
+    <text x="270" y="449" font-weight="700">ブート ROM</text>
+  </g>
+
+  <!-- address ticks (left) -->
+  <g font-size="12" fill="#57606a" text-anchor="end" font-family="monospace">
+    <text x="140" y="44">$0000</text>
+    <text x="140" y="84">$0100</text>
+    <text x="140" y="134">$0400</text>
+    <text x="140" y="284">$FA00</text>
+    <text x="140" y="320">$FB00</text>
+    <text x="140" y="364">$FC00</text>
+    <text x="140" y="424">$FE00</text>
+    <text x="140" y="474">$FFFF</text>
+  </g>
+</svg>

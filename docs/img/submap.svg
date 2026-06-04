@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 540" font-family="-apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif">
+  <rect x="0" y="0" width="680" height="540" rx="8" fill="#f6f8fa"/>
+  <text x="20" y="30" font-size="15" font-weight="700" fill="#1f2328">サブシステム側 メモリマップ (サブ 6809)</text>
+
+  <!-- ===== 全体カラム (x=120 w=190) ===== -->
+  <g stroke="#8c959f" stroke-width="1.2">
+    <rect x="120" y="50"  width="190" height="70"  fill="#fff8e1"/>
+    <rect x="120" y="120" width="190" height="70"  fill="#fdecea"/>
+    <rect x="120" y="190" width="190" height="70"  fill="#eaf2fb"/>
+    <rect x="120" y="260" width="190" height="120" fill="#eafaef" stroke="#1a7f37" stroke-width="2"/>
+    <rect x="120" y="380" width="190" height="60"  fill="#fdeef0"/>
+    <rect x="120" y="440" width="190" height="60"  fill="#f3eefb"/>
+  </g>
+  <g font-size="12.5" fill="#1f2328" text-anchor="middle">
+    <text x="215" y="82">VRAM B plane</text><text x="215" y="101" font-size="11" fill="#57606a">背景 (青/黒)</text>
+    <text x="215" y="152">VRAM R plane</text><text x="215" y="171" font-size="11" fill="#57606a">前景 赤成分</text>
+    <text x="215" y="222">VRAM G plane</text><text x="215" y="241" font-size="11" fill="#57606a">前景 G成分(シアン)</text>
+    <text x="215" y="316" font-weight="700" fill="#1a7f37">フリー RAM</text>
+    <text x="215" y="336" font-size="11.5" fill="#57606a">わずか 4 KB</text>
+    <text x="215" y="356" font-size="11.5" fill="#57606a">(ここに全部詰める)</text>
+    <text x="215" y="414">I/O ・ 共有 RAM</text>
+    <text x="215" y="475">サブシステム ROM</text>
+  </g>
+  <g font-size="12" fill="#57606a" text-anchor="end" font-family="monospace">
+    <text x="112" y="54">$0000</text>
+    <text x="112" y="124">$4000</text>
+    <text x="112" y="194">$8000</text>
+    <text x="112" y="264">$C000</text>
+    <text x="112" y="384">$D000</text>
+    <text x="112" y="444">$E000</text>
+    <text x="112" y="504">$FFFF</text>
+  </g>
+
+  <!-- ===== 拡大コールアウト: $C000-$CFFF (x=440 w=200) ===== -->
+  <line x1="310" y1="260" x2="440" y2="70"  stroke="#1a7f37" stroke-width="1" stroke-dasharray="4 3"/>
+  <line x1="310" y1="380" x2="440" y2="470" stroke="#1a7f37" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="540" y="44" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1a7f37">フリー RAM の内訳</text>
+
+  <g stroke="#8c959f" stroke-width="1.1">
+    <rect x="440" y="70"  width="200" height="50" fill="#ffffff"/>
+    <rect x="440" y="120" width="200" height="40" fill="#eef4fb"/>
+    <rect x="440" y="160" width="200" height="100" fill="#eafaef" stroke="#1a7f37" stroke-width="1.6"/>
+    <rect x="440" y="260" width="200" height="100" fill="#eaf2fb" stroke="#0969da" stroke-width="1.6"/>
+    <rect x="440" y="360" width="200" height="60"  fill="#fff8e1" stroke="#9a6700" stroke-width="1.6"/>
+    <rect x="440" y="420" width="200" height="26"  fill="#ffffff"/>
+    <rect x="440" y="446" width="200" height="24"  fill="#fdeef0" stroke="#bf3989" stroke-width="1.5"/>
+  </g>
+  <g font-size="12" fill="#1f2328" text-anchor="middle">
+    <text x="540" y="99" fill="#57606a">(未使用)</text>
+    <text x="540" y="144">作業変数</text>
+    <text x="540" y="206" font-weight="700">subprog コード本体</text><text x="540" y="225" font-size="11" fill="#57606a">1 KB</text>
+    <text x="540" y="306" font-weight="700">sprite データ</text><text x="540" y="325" font-size="11" fill="#57606a">4 frame × 256B = 1 KB</text>
+    <text x="540" y="386">背景タイル</text><text x="540" y="404" font-size="11" fill="#57606a">512 B</text>
+    <text x="540" y="438" font-size="11" fill="#57606a">(空き RAM)</text>
+    <text x="540" y="462" font-size="10.5" font-weight="700" fill="#bf3989">HW スタック (潰さない)</text>
+  </g>
+  <g font-size="11.5" fill="#57606a" text-anchor="end" font-family="monospace">
+    <text x="434" y="74">$C000</text>
+    <text x="434" y="124">$C200</text>
+    <text x="434" y="164">$C300</text>
+    <text x="434" y="264">$C700</text>
+    <text x="434" y="364">$CB00</text>
+    <text x="434" y="424">$CD00</text>
+    <text x="434" y="450">$CFA0</text>
+    <text x="434" y="474">$CFFF</text>
+  </g>
+</svg>
