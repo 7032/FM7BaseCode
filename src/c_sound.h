@@ -12,7 +12,7 @@
  * mixer (R7) は起動時に固定し、 各音の ON/OFF は音量レジスタで行う。
  *
  * 駆動はフレーム同期: メインループ先頭のフレームペーシング (= timer による
- * 20ms 単位の deadline) のあと sound_tick() を 1 回呼ぶ。 BGM の音長カウントと
+ * 約 32ms 単位の deadline (= FRAME_TARGET=16 × 約2ms)) のあと sound_tick() を 1 回呼ぶ。 BGM の音長カウントと
  * SE の減衰/リリースはすべてこのティックで進む。
  *
  * 仕組みの詳細は docs/SOUND.md。

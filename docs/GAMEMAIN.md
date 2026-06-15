@@ -17,6 +17,8 @@ unsigned char dir_idx  = DIR_DOWN;   /* 現在向いてる方向 (= sub 常駐 4
 unsigned char frame    = 0;          /* 歩行アニメ frame (0..3) */
 unsigned char anim_cnt = 0;          /* frame を進めるカウンタ */
 
+/* 0. サブ CPU に CANCEL を発行しコマンド待ちへ戻す (= テープ起動 warm start 対策) */
+sub_cancel();
 /* 1. cursor OFF */
 { unsigned char p = 0x00; subsys_call(SCMD_CURSOR, &p, 1); }
 /* 2. sub idle 待ち (← 重要) */
@@ -42,6 +44,10 @@ sub_blit_sprite(frame, x, y);
 /* 12. SCORE 等のテキストを初期表示 (メインループで毎フレーム上書きし直す) */
 sub_draw_text(...);
 ```
+
+### 1.0 サブ CANCEL (step 0)
+
+テープ起動 (= BASIC 稼働中に `LOADM,,R` で本体へ突入する warm start) では、 サブ CPU が BASIC のサブシステム処理の途中に居て、 後続の takeover が期待する「コマンド待ちループ」 状態になっていません。 起動時に一度 `sub_cancel()` を呼んでサブを既知のコマンド待ち状態へ揃えます。 ディスク起動 (cold start) では既にコマンド待ちなので無害です (詳細は [CMT.md](CMT.md) と [GAMESUB.md §3](GAMESUB.md#3-srcasm_subsyss--サブ-cpu-haltrelease))。
 
 ### 1.1 cursor OFF (step 1)
 

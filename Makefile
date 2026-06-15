@@ -24,6 +24,13 @@ BIN          = $(BUILD)/$(NAME).bin
 IPL          = $(BUILD)/ipl.bin
 D77          = $(BUILD)/$(NAME).d77
 HFE          = $(BUILD)/$(NAME).hfe     # HFE (HxC Floppy Emulator) 形式 (D77 から MFM 変換)
+T77          = $(BUILD)/$(NAME).t77      # FM-7 カセットテープ(CMT)イメージ (D77 と同一内容)
+WAV          = $(BUILD)/$(NAME).wav      # CMT ロード用 FSK 音声 (44.1kHz/16bit/mono)
+CMTPROC      = $(BUILD)/$(NAME).cmt.txt   # CMT ロード操作手順テキスト
+T77TOOL      = $(SCRIPTS)/d77_to_t77_chunks.py
+T77_TRAMPS   = $(SCRIPTS)/trampoline_fwd_int.bin $(SCRIPTS)/trampoline_rev_int.bin \
+               $(SCRIPTS)/trampoline_fwd_last.bin $(SCRIPTS)/trampoline_rev_last.bin \
+               $(SCRIPTS)/trampoline_relocate2.bin
 BOOTROM      = $(BUILD)/bootrom.bin    # 自前ブート ROM (DOS モードのブート ROM 代替、別ターゲット)
 LINK_SCRIPT  = $(BUILD)/link.script    # config.mk の ORG から自動生成
 
@@ -72,7 +79,7 @@ ASM_OBJS     = $(ASM_SRCS:$(SRC)/%.s=$(BUILD)/%.o)
 GEN_ASM_OBJS = $(GEN_ASM_SRCS:$(ASSETS_SRC)/%.s=$(BUILD)/%.o)
 OBJS         = $(ASM_OBJS) $(GEN_ASM_OBJS) $(C_OBJS)
 
-.PHONY: all bin bootrom clean
+.PHONY: all bin bootrom t77 clean
 
 # デフォルトターゲット: 3 つの成果物 (IPL + 本体 BIN + 自前ブート ROM) と
 # それらを束ねた D77、 さらに D77 から変換した HFE を全部生成する
@@ -189,6 +196,25 @@ $(D77): $(IPL) $(BIN)
 # HFE のフォーマットは公式仕様が公開されている (詳細は docs/DETAIL.md)。
 $(HFE): $(D77) $(SCRIPTS)/d77_to_hfe.py
 	python3 $(SCRIPTS)/d77_to_hfe.py $(D77) -o $@
+
+# ---- T77 / WAV (CMT カセットテープ) ----
+# `make t77` で D77 と同じイメージを CMT ロード向けに変換し、T77 テープ
+# イメージ・WAV(FSK 音声)・操作手順テキストを同時生成する。D77 を
+# 16KiB チャンクへ分解し、各 LOADM ブロックにトランポリンを付けて裏 RAM
+# 経由で最終配置する方式 (詳細は docs/CMT.md)。
+#
+# 本体エントリ ($(ORG)) が $2000 未満の場合、テープ多段ロードの裏 RAM
+# 退避枠が 16KiB 1 枠しか取れず実質上限 32KiB。これを超えると変換ツールが
+# 「CMTロード不可」エラーで終了し make が停止する。
+t77: $(T77) $(WAV)
+
+# T77/WAV/手順テキストは 1 回の変換でまとめて生成される。WAV は T77 生成の
+# 副産物なので $(T77) に依存させ、recipe の二重実行を防ぐ。
+$(T77): $(D77) $(T77TOOL) $(T77_TRAMPS)
+	python3 $(T77TOOL) $(D77) --addr $(ORG) -o $(T77) -w $(WAV) -t $(CMTPROC)
+
+$(WAV): $(T77)
+	@:
 
 # 通常クリーン:
 #   build/         : ビルド成果物

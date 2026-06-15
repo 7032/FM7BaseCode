@@ -54,6 +54,12 @@
 void subsys_halt(void);
 void subsys_release(void);
 
+/* サブCPU に CANCEL を発行し、 実行中の処理を中断してサブシステム ROM の
+ * コマンド待ちループへ戻す。 テープ起動 (= warm start) で本体へ突入した
+ * 際、 サブを takeover 可能なクリーン状態に揃えるために起動時 1 回呼ぶ。
+ * ディスク起動 (cold start) では無害。 */
+void sub_cancel(void);
+
 /* ------------------------------------------------------------
  * subsys_call(cmd, params, param_len)
  *   サブシステム ROM の標準コマンドを 1 発で発行する。 詳細は c_subsys.c。

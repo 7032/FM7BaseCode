@@ -39,8 +39,10 @@ FM-7 / FM77AV (および AV40 / AV40EX) で動くプログラムを、 現代的
 | [docs/SPRITE.md](docs/SPRITE.md) | sprite データ形式 (32x32 pixel、 前景 R/G 2 plane = 赤/シアン/白) と sprite_to_asm.py |
 | [docs/TIMER.md](docs/TIMER.md) | フレームペーシング (メイン CPU の周期タイマ IRQ を数える deadline 方式) の仕組み |
 | [docs/SOUND.md](docs/SOUND.md) | PSG (AY-3-8910) サウンド (発射音=ノイズ / 歩行音 / 単音 BGM) の仕組み |
+| [docs/CMT.md](docs/CMT.md) | D77 から T77 テープイメージと WAV(FSK 音声)を作る `make t77` の仕組み (CMT ロード手順・FSK 変調・トランポリン多段ロード・サイズ上限) |
 | [docs/TILEMAP.md](docs/TILEMAP.md) | タイルマップ背景の設計メモ (発展) |
 | [docs/FONT.md](docs/FONT.md) | 同梱 8x8 font (Press Start 2P, OFL-1.1) のライセンス・生成パイプライン・データ仕様 |
+| [CHANGELOG.md](CHANGELOG.md) | 主要な変更履歴 (日付ベース、 新しい順) |
 
 | ツール | 役割 | 入手元 |
 | --- | --- | --- |
@@ -205,6 +207,7 @@ make
 | `make`         | デフォルト: BIN・D77・HFE・自前ブート ROM を全部作る |
 | `make bin`     | 本体 BIN (`build/<NAME>.bin`) だけ作る |
 | `make bootrom` | 自前ブート ROM (`build/bootrom.bin`) だけ作る |
+| `make t77`     | テープ用成果物 (T77 / WAV(FSK 音声) / 操作手順テキスト) を D77 から変換生成 (詳細は [docs/CMT.md](docs/CMT.md)) |
 | `make clean`   | `build/` をまるごと削除 |
 
 ビルドフローの詳しい中身は [docs/DETAIL.md §5](docs/DETAIL.md#5-makefile-の中で起きていること) を参照してください。
@@ -239,7 +242,7 @@ make
 
 ## 3.3 動かなかった時は
 
-お使いのエミュレータによっては挙動が異なることがあります。 ハマりやすいポイントを [docs/DETAIL.md §7](docs/DETAIL.md#7-動作確認時に当たりやすいポイント) にまとめてあります。 まずそちらを確認してみてください。
+プログラムによっては挙動が異なることがあります。 ハマりやすいポイントを [docs/DETAIL.md §7](docs/DETAIL.md#7-動作確認時に当たりやすいポイント) にまとめてあります。 まずそちらを確認してみてください。
 
 ---
 
@@ -250,4 +253,4 @@ make
 - Motorola 6809 命令セットリファレンス (各種ミラーあり)
 - MB8877 FDC データシート (各種ミラーあり)
 
-テープ起動 (T77 / WAV) など、 ディスク以外の起動経路については本テンプレートでは扱いません。
+テープ (CMT) からのロードにも対応しています。 `make t77` で T77 テープイメージと WAV (FSK 音声) を生成できます。 詳細は [docs/CMT.md](docs/CMT.md) を参照してください。

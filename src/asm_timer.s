@@ -31,7 +31,8 @@
 *   ・IRQ ベクタ $FFF8 は IPL が RAM モード ($FD0F write) にして以降 RAM。
 *   ・タイマ IRQ フラグ $FD03 bit2 は active-low (0=発生)。 $FD03 read で
 *     ack される前提 (= クリアされないと IRQ が再発火し続ける)。
-*   ・キーボード IRQ ($FD02 bit0) は使わず無効化する (= キー入力はポーリング)。
+*   ・キーボード IRQ ($FD02 bit0) も許可し、 IRQ ハンドラでキーコードを
+*     _kbd_buf に取り込む (= キー入力は IRQ 駆動)。
 *   詳細は docs/TIMER.md。
 * ============================================================
 
@@ -51,7 +52,7 @@ IRQ_VECTOR      equ     $FFF8           * 6809 IRQ ベクタ (RAM モードで R
 
 
 * void timer_init(void) — IRQ ベクタを設置し、 タイマ IRQ を許可する (起動時 1 回)。
-*   キーボード IRQ (bit0) は立てない (= キー入力はポーリングのため)。
+*   キーボード IRQ (bit0) も合わせて許可する (= キー入力を IRQ 駆動にするため)。
 _timer_init:
                 ldd     #_irq_isr
                 std     IRQ_VECTOR      * $FFF8/$FFF9 に handler 番地
