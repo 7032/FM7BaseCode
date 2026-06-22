@@ -2,6 +2,16 @@
 
 本ファイルは FM7BaseCode の主要な変更点を記録します。 書式は [Keep a Changelog](https://keepachangelog.com/ja/) に準拠し、 プロジェクトに版番号が無いため、 見出しは日付ベース (新しい順) で記載します。
 
+## 2026-06-22
+
+### Added
+- **機種判別 / FM 音源搭載判定 / ジョイスティック読み出しの C API (`c_device`) を追加**: `GetMachineType()` / `GetMachineName()` / `HasFMSound()` / `JoyStick()` を提供 ([src/c_device.c](src/c_device.c) / [src/c_device.h](src/c_device.h))。 `GetMachineType()` は機能ビットマスク (`FEAT_*`) を返し、 現状は FM 音源 (OPN) と FM77AV 系を検出 (他ビットは予約)。 詳細は [docs/DEVICE.md](docs/DEVICE.md)
+- 上記を解説する [docs/DEVICE.md](docs/DEVICE.md) を新設
+
+### Docs
+- README に「0. リポジトリを入手する (git clone / 更新)」の GitHub 入門ガイドを新設。 本テンプレ更新時の手順 (`git pull` → `make` で再ビルド、 自分の編集と衝突した場合の対処) も追記し、 [docs/TUTORIAL.md](docs/TUTORIAL.md) からも案内
+- README の macOS 導入手順を是正 (= Xcode CLT 同梱の `curl` で取得し、 配布 tarball の素の `./configure && make` でビルド可能なことを明記。 ダウンロードを `wget` から `curl -L -O` へ統一し、 Boost / Bison / Flex を任意扱いへ格下げ)
+
 ## 2026-06-13
 
 ### Added

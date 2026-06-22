@@ -34,7 +34,7 @@ T77_TRAMPS   = $(SCRIPTS)/trampoline_fwd_int.bin $(SCRIPTS)/trampoline_rev_int.b
 BOOTROM      = $(BUILD)/bootrom.bin    # 自前ブート ROM (DOS モードのブート ROM 代替、別ターゲット)
 LINK_SCRIPT  = $(BUILD)/link.script    # config.mk の ORG から自動生成
 
-C_SRCS       = $(SRC)/c_main.c $(SRC)/c_subsys.c $(SRC)/c_subprog.c $(SRC)/c_sound.c
+C_SRCS       = $(SRC)/c_main.c $(SRC)/c_subsys.c $(SRC)/c_subprog.c $(SRC)/c_sound.c $(SRC)/c_device.c
 ASM_SRCS     = $(SRC)/asm_crt0.s $(SRC)/asm_subsys.s $(SRC)/asm_runtime.s \
                $(SRC)/asm_test.s $(SRC)/asm_kbd.s $(SRC)/asm_timer.s
 

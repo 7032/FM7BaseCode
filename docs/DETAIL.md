@@ -29,6 +29,7 @@ FM7BaseCode/
 │   ├── c_subsys.c / .h      ← サブシステム ROM 経由 API (高レベル)
 │   ├── c_subprog.c / .h     ← 自前 subprog + sprite + キー入力 C API
 │   ├── c_sound.c / .h       ← PSG サウンド (発射音/歩行音/単音 BGM、 メイン側 I/O)
+│   ├── c_device.c / .h      ← 機種判別 / FM 音源搭載判定 / ジョイスティック読み出し
 │   └── link.script          ← Makefile が config.mk の ORG から自動生成
 ├── scripts/                   ← 変換/ビルド用スクリプト (git track、 データと分離)
 │   ├── make_font_png.py     ← TTF → assets/font.png
@@ -167,6 +168,7 @@ $FFFF ─┘     FM-7 / FM77AV のブート ROM
 | [src/c_subsys.c](../src/c_subsys.c) | 同上の実装 | §6 参照 |
 | [src/c_subprog.h](../src/c_subprog.h) | 自前 sub プログラム + sprite + キー入力 C API | [SUBPROGRAM.md §4](SUBPROGRAM.md#4-c-高レベル-api) |
 | [src/c_subprog.c](../src/c_subprog.c) | 同上の実装 | 同上 |
+| [src/c_device.c](../src/c_device.c) / [.h](../src/c_device.h) | 機種判別 / FM 音源搭載判定 / ジョイスティック読み出し | [DEVICE.md](DEVICE.md) |
 
 ---
 

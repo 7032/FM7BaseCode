@@ -1,6 +1,6 @@
 # GAMESUB.md — アセンブラ部分の概要
 
-本テンプレートには C ソース ([c_main.c](../src/c_main.c) / [c_subsys.c](../src/c_subsys.c) / [c_subprog.c](../src/c_subprog.c) / [c_sound.c](../src/c_sound.c)) と並んで複数のアセンブラソース (`*.s`) が含まれます。 このドキュメントでは、 各 `.s` ファイルの「何のために存在しているか」 と「何を担当しているか」 を簡潔に説明します。
+本テンプレートには C ソース ([c_main.c](../src/c_main.c) / [c_subsys.c](../src/c_subsys.c) / [c_subprog.c](../src/c_subprog.c) / [c_sound.c](../src/c_sound.c) / [c_device.c](../src/c_device.c)) と並んで複数のアセンブラソース (`*.s`) が含まれます。 このドキュメントでは、 各 `.s` ファイルの「何のために存在しているか」 と「何を担当しているか」 を簡潔に説明します。
 
 > **サウンド ([c_sound.c](../src/c_sound.c)) は asm モジュールを持ちません**。 PSG (AY-3-8910) はメイン CPU 側 I/O (`$FD0D`/`$FD0E`) なので、 メイン側 C だけで完結します (= サブ系統と独立)。 詳細は [SOUND.md](SOUND.md)。
 

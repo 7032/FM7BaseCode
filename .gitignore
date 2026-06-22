@@ -12,3 +12,8 @@ assets/src/
 
 # Python キャッシュ
 __pycache__/
+
+# macOS の .DS_Store や Thumbs.db などのゴミファイル
+.DS_Store
+Thumbs.db
+._*

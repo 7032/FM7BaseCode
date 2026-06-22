@@ -39,6 +39,7 @@ FM-7 / FM77AV (および AV40 / AV40EX) で動くプログラムを、 現代的
 | [docs/SPRITE.md](docs/SPRITE.md) | sprite データ形式 (32x32 pixel、 前景 R/G 2 plane = 赤/シアン/白) と sprite_to_asm.py |
 | [docs/TIMER.md](docs/TIMER.md) | フレームペーシング (メイン CPU の周期タイマ IRQ を数える deadline 方式) の仕組み |
 | [docs/SOUND.md](docs/SOUND.md) | PSG (AY-3-8910) サウンド (発射音=ノイズ / 歩行音 / 単音 BGM) の仕組み |
+| [docs/DEVICE.md](docs/DEVICE.md) | 機種判別と入力デバイス (FM 音源搭載判定 / ジョイスティック読み出し) の C API (`c_device`) |
 | [docs/CMT.md](docs/CMT.md) | D77 から T77 テープイメージと WAV(FSK 音声)を作る `make t77` の仕組み (CMT ロード手順・FSK 変調・トランポリン多段ロード・サイズ上限) |
 | [docs/TILEMAP.md](docs/TILEMAP.md) | タイルマップ背景の設計メモ (発展) |
 | [docs/FONT.md](docs/FONT.md) | 同梱 8x8 font (Press Start 2P, OFL-1.1) のライセンス・生成パイプライン・データ仕様 |
@@ -51,6 +52,48 @@ FM-7 / FM77AV (および AV40 / AV40EX) で動くプログラムを、 現代的
 | LWLINK | LWASM 用リンカ | LWTOOLS に同梱 |
 
 CMOC は内部で LWASM を呼び出すため、 両者をセットで導入します。
+
+---
+
+# 0. リポジトリを入手する (git clone / 更新)
+
+本テンプレは GitHub で公開されているので、 **Git** で手元に取得します。 はじめての方は次の流れで OK です。
+
+1. **GitHub アカウントを作る** (まだの方は <https://github.com/> で無料登録)。 公開リポジトリを取得するだけならアカウント無しでも可能ですが、 作っておくと後々便利です。
+2. **Git を入れる**: 多くの環境には最初から入っていますが、 無ければ各 OS で導入します。
+   - **macOS**: Xcode Command Line Tools に同梱 (`xcode-select --install` で入ります)。
+   - **Linux**: パッケージ管理ツールで導入 (例: `sudo apt install git`)。
+   - **Windows**: WSL2 の Ubuntu 内に `sudo apt install git` で導入 (本テンプレは WSL2 上で作業します)。
+3. **リポジトリを取得する** (`git clone`):
+
+```bash
+git clone <リポジトリのURL>
+```
+
+4. **取得したディレクトリへ入る**:
+
+```bash
+cd FM7BaseCode
+```
+
+   あとは下の **§1 以降の手順**でツールチェインを入れ、 `make` でビルドします。
+5. **後日、 本テンプレが更新されたら**、 リポジトリのディレクトリ内で最新を取り込み、 **ビルドし直します**。
+
+```bash
+git pull        # 最新の変更を取り込む
+make            # 取り込んだ変更でビルドし直す (= 新しい D77 を作る)
+```
+
+   `git pull` しただけでは、 手元の `build/` は古いままです。 **必ず `make` で作り直して**から、 エミュレータで動作確認 (§3) してください。 うまく反映されない・ビルドが変なときは `make clean && make` で一度まっさらにして作り直します。
+
+   > **自分でソースを編集している場合**: `git pull` で本体側の更新とあなたの変更がぶつかる (= コンフリクト) ことがあります。 安全に取り込むには、 自分の変更を先にコミットしておくか、 作業用ブランチ (例 `git switch -c mygame`) や フォークで進めるのがおすすめです。 Git の操作に不安があれば、 編集前のきれいな状態を別フォルダに `git clone` で取り分けておくだけでも安心です。
+
+> `<リポジトリのURL>` には、 配布元 GitHub ページの **Code** ボタンから表示される URL を入れてください。
+
+Git / GitHub の使い方そのものに本書では深入りしません。 もっと知りたい方は次を参照してください。
+
+- **GitHub 公式ヘルプ (日本語)**: <https://docs.github.com/ja>
+- 日本語の入門記事は **Qiita** (<https://qiita.com/>) や **Zenn** (<https://zenn.dev/>) で「git 入門」「github 入門」などで検索すると数多く見つかります。
 
 ---
 
@@ -87,7 +130,7 @@ xcode-select --install     # 未導入なら
 
 ## 1.2 ビルドに必要なパッケージ
 
-CMOC のビルドには Boost / Bison / Flex などが必要です。 LWTOOLS は素の make があれば足ります。 D77 化・font/sprite 変換スクリプト用に Python3 + Pillow (PIL) も入れます。 **自分の OS の行を実行**してください。
+ビルドには **make / C コンパイラ**と、 D77 化・font/sprite 変換スクリプト用の **Python3 + Pillow (PIL)** が要ります。 CMOC / LWTOOLS は配布 tarball を素の `./configure && make` でビルドできます (= parser 生成済みのため Bison/Flex 等は通常不要)。 **自分の OS の行を実行**してください。
 
 **Debian / Ubuntu (WSL2 含む):**
 ```bash
@@ -104,13 +147,15 @@ sudo dnf install -y gcc gcc-c++ make boost-devel bison flex \
 
 **macOS (Homebrew):**
 ```bash
-brew install boost bison flex texinfo autoconf automake python3 wget
+brew install autoconf automake python3
 python3 -m pip install --user pillow      # = python3-pil 相当 (= ダメなら venv か --break-system-packages)
 ```
-> macOS 標準の bison/flex は古いため、 **CMOC のビルド時のみ** Homebrew 版を PATH 前段に通します:
+macOS は **Xcode Command Line Tools** に `make` / C コンパイラ / `curl` が同梱されており、 これだけで CMOC / LWTOOLS の素の `./configure && make` が通ります (= 配布 tarball は parser 生成済みのため Bison/Flex は不要)。
+> **任意 (上級者向け)**: ソースから parser を再生成したい場合のみ `brew install boost bison flex` を追加し、 **その作業時だけ** Homebrew 版 bison/flex を PATH 前段に通します:
 > `export PATH="$(brew --prefix bison)/bin:$(brew --prefix flex)/bin:$PATH"`
+> 通常のビルドでは不要です。
 
-`python3-pil` (Pillow) は同梱 8x8 font の TTF→PNG ラスタライズに使います (= ビルド時に upstream から TTF を取得して派生物として生成。 詳細は [docs/FONT.md](docs/FONT.md))。 `curl`/`wget` も同用途。 初回 `make` だけネットワークが要り、 2 回目以降は DL 済みファイル再利用でオフライン可。
+`python3-pil` (Pillow) は同梱 8x8 font の TTF→PNG ラスタライズに使います (= ビルド時に upstream から TTF を取得して派生物として生成。 詳細は [docs/FONT.md](docs/FONT.md))。 TTF 取得には `curl` (macOS 標準同梱、 Linux も大半が同梱) を用います。 初回 `make` だけネットワークが要り、 2 回目以降は DL 済みファイル再利用でオフライン可。
 
 ## 1.3 LWTOOLS (LWASM / LWLINK) のインストール — 全 OS 共通
 
@@ -119,7 +164,7 @@ LWTOOLS は公式サイトから tarball を取得してソースビルドしま
 ```bash
 cd ~
 mkdir -p src && cd src
-wget http://www.lwtools.ca/releases/lwtools/lwtools-4.22.tar.gz
+curl -L -O http://www.lwtools.ca/releases/lwtools/lwtools-4.22.tar.gz
 tar xzf lwtools-4.22.tar.gz
 cd lwtools-4.22
 make
@@ -130,11 +175,11 @@ sudo make install
 
 ## 1.4 CMOC のインストール — 全 OS 共通
 
-CMOC も同様にソースから入れます (全 OS 共通)。 macOS では前述の通り Homebrew 版 bison/flex を PATH に通した状態で `./configure` してください。
+CMOC も同様にソースから入れます (全 OS 共通)。 配布 tarball は parser 生成済みなので、 素の `./configure && make` で通ります (= Boost / Bison / Flex は不要)。
 
 ```bash
 cd ~/src
-wget http://sarrazip.com/dev/cmoc-0.1.98.tar.gz
+curl -L -O http://sarrazip.com/dev/cmoc-0.1.98.tar.gz
 tar xzf cmoc-0.1.98.tar.gz
 cd cmoc-0.1.98
 ./configure
@@ -142,11 +187,14 @@ make
 sudo make install
 ```
 
+> **任意の補足**: 万一 `./configure` が Boost 等を要求する環境では、 Homebrew の場所を渡します:
+> `./configure CPPFLAGS="-I$(brew --prefix boost)/include" LDFLAGS="-L$(brew --prefix boost)/lib"`
+
 `cmoc --version` が通れば導入は完了です。 バージョン番号 (`0.1.98`) は適宜、 公式ページ掲載の最新版に読み替えてください。 配布元 `sarrazip.com` は作者の恒久 URL (permalink) で、 アクセス時に実際のホスティング先へ自動転送されます。 HTTP のみ対応 (HTTPS 非対応) です。
 
 ## 1.5 エディタ (任意)
 
-エディタは何でも構いません。 **VS Code** を使う場合の例:
+エディタは何でも構いませんが、 はじめての方には **Visual Studio Code (VS Code)** がおすすめです (無料・全 OS 対応で、 C / Makefile / Markdown を扱いやすい)。 起動例:
 
 - **Windows (WSL2)**: VS Code に拡張 **Remote - WSL** を入れ、 WSL のターミナルで
   プロジェクトへ移動して `code .` (= WSL 側のファイルを直接編集)。
@@ -157,6 +205,15 @@ sudo make install
 - **C/C++** (インテリセンス用)
 - **Makefile Tools**
 - **6809 / Motorola syntax highlighting** 系 (任意)
+
+### Markdown ドキュメントを見やすく読む
+
+本テンプレの解説は `docs/` 以下に **Markdown** (`.md`) で置いてあります。 VS Code で `.md` ファイルを開き、 次のショートカットで**整形済みプレビュー**を開けます (表や図リンクが見やすくなります)。
+
+- **macOS**: `⌘ + Shift + V`
+- **Windows / Linux**: `Ctrl + Shift + V`
+
+エディタの右上にある**プレビューアイコン**を押すと、 編集画面の横に並べて表示することもできます。 GitHub のリポジトリ画面でも `.md` は整形表示されるので、 ブラウザ上で読んでも構いません。
 
 ---
 
