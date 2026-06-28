@@ -23,7 +23,8 @@ BUILD        = ./build
 BIN          = $(BUILD)/$(NAME).bin
 IPL          = $(BUILD)/ipl.bin
 D77          = $(BUILD)/$(NAME).d77
-HFE          = $(BUILD)/$(NAME).hfe     # HFE (HxC Floppy Emulator) 形式 (D77 から MFM 変換)
+HFE          = $(BUILD)/$(NAME).hfe     # HFE 形式 / 2D 機種用 (FM-7/FM77AV)
+HFE2DD       = $(BUILD)/$(NAME)_2dd.hfe  # HFE / 2DD 機種用 (FM77AV20 以降)。Double Step 相当 80trk
 T77          = $(BUILD)/$(NAME).t77      # FM-7 カセットテープ(CMT)イメージ (D77 と同一内容)
 WAV          = $(BUILD)/$(NAME).wav      # CMT ロード用 FSK 音声 (44.1kHz/16bit/mono)
 CMTPROC      = $(BUILD)/$(NAME).cmt.txt   # CMT ロード操作手順テキスト
@@ -83,7 +84,7 @@ OBJS         = $(ASM_OBJS) $(GEN_ASM_OBJS) $(C_OBJS)
 
 # デフォルトターゲット: 3 つの成果物 (IPL + 本体 BIN + 自前ブート ROM) と
 # それらを束ねた D77、 さらに D77 から変換した HFE を全部生成する
-all: $(D77) $(HFE) $(BOOTROM)
+all: $(D77) $(HFE) $(HFE2DD) $(BOOTROM)
 
 bin: $(BIN)
 
@@ -192,10 +193,15 @@ $(D77): $(IPL) $(BIN)
 	    --org $(ORG) \
 	    -o $@
 
-# HFE は D77 を IBM System 34 互換 MFM へ変換 (HxC Floppy Emulator 形式)。
+# HFE は D77 を IBM System 34 互換 MFM へ変換 (HFE 形式)。
 # HFE のフォーマットは公式仕様が公開されている (詳細は docs/DETAIL.md)。
 $(HFE): $(D77) $(SCRIPTS)/d77_to_hfe.py
-	python3 $(SCRIPTS)/d77_to_hfe.py $(D77) -o $@
+	python3 $(SCRIPTS)/d77_to_hfe.py $(D77) --mode 2d -o $@
+
+# 2DD 機種用 HFE。2D の各トラックを物理トラック 2N/2N+1 へ複製した
+# Double Step 相当 (80 トラック)。80 位置のドライブでも差し替えだけで読める。
+$(HFE2DD): $(D77) $(SCRIPTS)/d77_to_hfe.py
+	python3 $(SCRIPTS)/d77_to_hfe.py $(D77) --mode 2dd -o $@
 
 # ---- T77 / WAV (CMT カセットテープ) ----
 # `make t77` で D77 と同じイメージを CMT ロード向けに変換し、T77 テープ

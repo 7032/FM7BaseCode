@@ -2,6 +2,17 @@
 
 本ファイルは FM7BaseCode の主要な変更点を記録します。 書式は [Keep a Changelog](https://keepachangelog.com/ja/) に準拠し、 プロジェクトに版番号が無いため、 見出しは日付ベース (新しい順) で記載します。
 
+## 2026-06-28
+
+### Added
+- **HFE を 2D 機種用・2DD 機種用に出し分け**: `scripts/d77_to_hfe.py` に `--mode {2d,2dd}` を追加。 `make` 一発で `build/<NAME>.hfe` (2D 機種=FM-7/FM77AV 用) と `build/<NAME>_2dd.hfe` (2DD 機種=FM77AV20 以降用) を同時生成する。 2DD 用は 2D の各トラックを物理トラック 2N/2N+1 の 2 本へ複製した Double Step 相当 (80 トラック) で、 80 位置のドライブでもファイル差し替えだけで読める。 複製した 2 本の ID アドレスマークの C(シリンダ)バイトには元の 2D シリンダ番号 N を入れる。
+
+### Changed
+- 既定モード (`--mode 2d`) の出力は従来と完全に同一 (バイナリ一致) であり、 既存利用に対する挙動変化・リグレッションは無い。
+
+### Docs
+- README / DETAIL / qiita に HFE の 2D/2DD 出し分けを反映
+
 ## 2026-06-22
 
 ### Added
@@ -53,7 +64,7 @@
 ## 2026-06-03
 
 ### Added
-- D77 から HFE (HxC Floppy Emulator 形式) も同時ビルドするように
+- D77 から HFE 形式も同時ビルドするように
 
 ### Fixed
 - SCORE 表示の文字化けを修正し、 配色を変更

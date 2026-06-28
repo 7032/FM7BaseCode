@@ -206,7 +206,8 @@ src/link.script (= config.mk の ORG から自動生成) ---------+
 
 build/<NAME>.bin  +  build/ipl.bin  --bin2d77.py-->  build/<NAME>.d77
                                                           |
-                                       --d77_to_hfe.py--> build/<NAME>.hfe
+                                       --d77_to_hfe.py--> build/<NAME>.hfe     (2D 機種用)
+                                       --d77_to_hfe.py--> build/<NAME>_2dd.hfe (2DD 機種用)
 ```
 
 ### 5.2 各ステップの注意
@@ -215,13 +216,13 @@ build/<NAME>.bin  +  build/ipl.bin  --bin2d77.py-->  build/<NAME>.d77
 - **lwlink + link.script**: CMOC が生成する `code` 以外のセクション (`rodata` / `start` / `initgl_*` 等) を全部 `$ORG` から連続配置するため。 これを省くと `JMP _main` などの cross-section 参照が `$ORG` オフセット抜きで解決されて本体が起動しません。
 - **IPL アセンブル**: `lwasm -D BODY_LOAD=$(ORG)` で config.mk の ORG を渡しています。 `asm_ipl.s` 側は `ifndef BODY_LOAD` で fallback も持っているので、 手動で lwasm を直接呼ぶ時にも壊れません。
 - **bin2d77.py**: IPL バイナリの +2 byte オフセットにある `body_sectors` を本体サイズから計算した値で書き換えてから、 D77 を組み立てます。
-- **d77_to_hfe.py**: D77 を IBM System 34 互換の MFM トラックへエンコードして HFE (HxC Floppy Emulator) 形式を生成します。 HFE のフォーマットは[公式仕様が公開されています](https://hxc2001.com/floppy_drive_emulator/HFE-file-format.html)。
+- **d77_to_hfe.py**: D77 を IBM System 34 互換の MFM トラックへエンコードして HFE 形式を生成します。 `--mode 2d` (既定) は 2D 機種 (FM-7/FM77AV) 用に 40 トラックの HFE を、 `--mode 2dd` は 2DD 機種 (FM77AV20 以降) 用に各 2D トラックを物理トラック 2N/2N+1 へ複製した Double Step 相当の 80 トラック HFE を生成します (複製した 2 本の ID アドレスマークの C バイトには元の 2D シリンダ番号 N を入れるため、 80 位置のドライブでもファイル差し替えだけで読めます)。 `make` は両方を同時に生成します。 HFE のフォーマットは[公式仕様が公開されています](https://hxc2001.com/floppy_drive_emulator/HFE-file-format.html)。
 
 ### 5.3 make ターゲット一覧
 
 | コマンド | 動作 |
 | --- | --- |
-| `make`         | 3 種類の BIN (IPL / 本体 / 自前 boot ROM) と D77・HFE を全部作る |
+| `make`         | 3 種類の BIN (IPL / 本体 / 自前 boot ROM) と D77・HFE (2D 用 + 2DD 用) を全部作る |
 | `make bin`     | 本体 BIN (`build/<NAME>.bin`) だけ作る |
 | `make bootrom` | 自前ブート ROM (`build/bootrom.bin`) だけ作る (詳細は GAMESUB.md §5) |
 | `make t77`     | D77 からテープ用成果物 (T77 / WAV(FSK 音声) / 操作手順テキスト) を変換生成 (詳細は [CMT.md](CMT.md)) |
@@ -235,7 +236,7 @@ build/<NAME>.bin  +  build/ipl.bin  --bin2d77.py-->  build/<NAME>.d77
 | `build/ipl.bin` | IPL (= D77 sector 1 の中身、 `$0100`(BASIC)/`$0300`(DOS) で起動 → `$FB00` へ relocate) | < 256 byte |
 | `build/<NAME>.bin` | プログラム本体 (= IPL が ORG=`$0400` に書き込む) | 任意 (最大 ~246 sector ≈ 61 KB) |
 
-これらを束ねた `build/<NAME>.d77`、 およびそれを MFM 変換した `build/<NAME>.hfe` も同時に生成されます。 テープ用の `build/<NAME>.t77` / `.wav` / `.cmt.txt` は `make t77` で別途生成します (詳細は [CMT.md](CMT.md))。
+これらを束ねた `build/<NAME>.d77`、 およびそれを MFM 変換した `build/<NAME>.hfe` (2D 機種用) と `build/<NAME>_2dd.hfe` (2DD 機種用) も同時に生成されます。 テープ用の `build/<NAME>.t77` / `.wav` / `.cmt.txt` は `make t77` で別途生成します (詳細は [CMT.md](CMT.md))。
 
 ---
 

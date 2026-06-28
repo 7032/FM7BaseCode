@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 """
-D77 ディスクイメージ → HFE (HxC Floppy Emulator) 変換ツール
+D77 ディスクイメージ → HFE 変換ツール
 
 D77 のセクタ列を IBM System 34 互換の MFM トラック (倍密度) として
 エンコードし、HFEv1 形式で出力する。FM-7 / FM77AV の 2D ディスク
 (40 trk × 2 side × 16 sec × 256 byte、250 kbit/s MFM) を対象とする。
 
+出力モードは 2 系統を選べる (--mode):
+  2d  : ソースのシリンダ数 (=40) をそのまま HFE トラック数とする。
+        2D 機種 (FM-7 / FM77AV) 向け。
+  2dd : 80 トラック位置の 2DD ドライブで 2D ソフトを読めるよう、2D の
+        各ソースシリンダ N を物理トラック 2N と 2N+1 の 2 本へ複製する
+        Double Step 相当の出力。HFE トラック数はソースシリンダ数×2 (=80)。
+        複製した 2 本の ID アドレスマークの C(シリンダ)バイトには、物理
+        トラック番号ではなく元の 2D シリンダ番号 N を入れる。
+
 HFE のフォーマットは公式仕様が公開されている:
-  HxC Floppy Emulator - HFE file format specification
+  HFE file format specification (公式公開仕様)
   https://hxc2001.com/floppy_drive_emulator/HFE-file-format.html
 本実装はこの公開仕様のみを参照したクリーンルーム実装。
 
@@ -164,11 +173,16 @@ def parse_d77(blob: bytes) -> dict:
 # ----------------------------------------------------------------------
 # HFE 書き出し
 # ----------------------------------------------------------------------
-def write_hfe(disk: dict, tracks: int, sides: int, out_path: str):
+def write_hfe(disk: dict, tracks: int, sides: int, out_path: str, double_step: bool = False):
+    # 2dd は 1 ソースシリンダを物理トラック 2N / 2N+1 の 2 本に複製する。
+    out_tracks = tracks * (2 if double_step else 1)
+    if double_step:
+        assert out_tracks == tracks * 2, "2dd は出力トラック数がソースの 2 倍になるはず"
+
     header = bytearray(b"\xFF" * 512)
     header[0:8] = b"HXCPICFE"
     header[8]  = 0x00                 # formatrevision = HFEv1
-    header[9]  = tracks
+    header[9]  = out_tracks
     header[10] = sides
     header[11] = 0x00                 # track_encoding = ISOIBM_MFM
     struct.pack_into("<H", header, 12, 250)    # bitRate kbit/s
@@ -181,22 +195,26 @@ def write_hfe(disk: dict, tracks: int, sides: int, out_path: str):
     track_len = BITSTREAM_PER_SIDE * 2          # 両面インターリーブの byte 数
     blocks_per_track = (track_len + 511) // 512
 
-    # トラックLUT (block 1)
+    # トラックLUT (block 1) — 物理トラック out_tracks 本ぶん
     lut = bytearray(b"\x00" * 512)
     block = 2                                    # トラックデータは block 2 から
-    for cyl in range(tracks):
-        struct.pack_into("<HH", lut, cyl * 4, block, track_len)
+    for p in range(out_tracks):
+        struct.pack_into("<HH", lut, p * 4, block, track_len)
         block += blocks_per_track
 
     out = bytearray(header) + bytearray(lut)
 
-    for cyl in range(tracks):
+    # 物理トラック p でループ。2dd 時は source_cyl = p // 2 なので
+    # 物理 2N と 2N+1 は同じソースシリンダ N から同一ビットストリームを生成し、
+    # ID の C は N (= 物理トラック番号ではない) となる。
+    for p in range(out_tracks):
+        source_cyl = p // 2 if double_step else p
         side_bits = []
         for head in range(sides):
-            sectors = disk.get((cyl, head))
+            sectors = disk.get((source_cyl, head))
             if sectors is None or len(sectors) < 16:
-                raise SystemExit(f"D77 に (cyl={cyl}, head={head}) の 16 セクタが揃っていません")
-            side_bits.append(build_track_bitstream(sectors, cyl, head))
+                raise SystemExit(f"D77 に (cyl={source_cyl}, head={head}) の 16 セクタが揃っていません")
+            side_bits.append(build_track_bitstream(sectors, source_cyl, head))
         # 256 byte 単位で side0/side1 をインターリーブ
         interleaved = bytearray()
         for i in range(0, BITSTREAM_PER_SIDE, 256):
@@ -288,9 +306,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("d77")
     ap.add_argument("-o", "--output", required=True)
+    ap.add_argument("--mode", choices=("2d", "2dd"), default="2d",
+                    help="2d: ソースのシリンダ数をそのまま出力 (既定)。"
+                         "2dd: 各 2D トラックを物理 2N/2N+1 へ複製した Double Step 相当")
     ap.add_argument("--selftest", action="store_true",
                     help="エンコード結果を再デコードして全セクタ一致を検証")
     args = ap.parse_args()
+
+    double_step = (args.mode == "2dd")
 
     blob = Path(args.d77).read_bytes()
     disk, tracks, sides = parse_d77(blob)
@@ -299,8 +322,9 @@ def main():
         n = selftest(disk, tracks, sides)
         print(f"self-test OK: {n} セクタを round-trip 検証 (CRC 一致)")
 
-    size, tlen, blk = write_hfe(disk, tracks, sides, args.output)
-    print(f"wrote {args.output}: {tracks}trk x {sides}side, "
+    size, tlen, blk = write_hfe(disk, tracks, sides, args.output, double_step)
+    out_tracks = tracks * (2 if double_step else 1)
+    print(f"wrote {args.output} [{args.mode}]: {out_tracks}trk x {sides}side, "
           f"track_len={tlen}B ({blk}blk/trk), file={size}B")
 
 

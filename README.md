@@ -250,18 +250,19 @@ make
 | パス | 役割 | サイズ |
 | --- | --- | --- |
 | `build/<NAME>.d77` | **エミュレータに投入するディスクイメージ** | — |
-| `build/<NAME>.hfe` | D77 を MFM 変換した HFE 形式 (HxC Floppy Emulator) | — |
+| `build/<NAME>.hfe` | D77 を MFM 変換した HFE 形式 / 2D 機種用 (FM-7/FM77AV) | — |
+| `build/<NAME>_2dd.hfe` | 同上を 2DD 機種用 (FM77AV20 以降) に複製した HFE 形式 | — |
 | `build/<NAME>.bin` | プログラム本体 (= IPL が `$ORG` に書き込む) | 任意 (最大 248 sector = 62 KB) |
 | `build/ipl.bin` | IPL (= D77 sector 1 の中身) | < 256 byte |
 | `build/bootrom.bin` | 自前ブート ROM (= 任意、 内蔵ブート ROM 代替) | 512 byte |
 
-`.hfe` は `.d77` と同じ内容を HFE (HxC Floppy Emulator) 形式に変換したものです。 HFE のフォーマットは[公式仕様が公開されています](https://hxc2001.com/floppy_drive_emulator/HFE-file-format.html)。
+`.hfe` は `.d77` と同じ内容を HFE 形式に変換したものです。 `make` 一発で `<NAME>.hfe` (2D 機種=FM-7/FM77AV 用) と `<NAME>_2dd.hfe` (2DD 機種=FM77AV20 以降用) を同時生成します。 2DD 用は 2D の各トラックを物理トラック 2 本へ複製した Double Step 相当で、 80 トラックのドライブでもファイルを差し替えるだけで読めます。 HFE のフォーマットは[公式仕様が公開されています](https://hxc2001.com/floppy_drive_emulator/HFE-file-format.html)。
 
 ## 2.3 make ターゲット一覧
 
 | コマンド | 動作 |
 | --- | --- |
-| `make`         | デフォルト: BIN・D77・HFE・自前ブート ROM を全部作る |
+| `make`         | デフォルト: BIN・D77・HFE (2D 用 + 2DD 用)・自前ブート ROM を全部作る |
 | `make bin`     | 本体 BIN (`build/<NAME>.bin`) だけ作る |
 | `make bootrom` | 自前ブート ROM (`build/bootrom.bin`) だけ作る |
 | `make t77`     | テープ用成果物 (T77 / WAV(FSK 音声) / 操作手順テキスト) を D77 から変換生成 (詳細は [docs/CMT.md](docs/CMT.md)) |
