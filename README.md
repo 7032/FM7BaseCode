@@ -304,6 +304,8 @@ make
 
 ---
 
+※「FM-7」「FM77AV」「FUJITSU MICRO 7」「F-BASIC」は富士通株式会社の商標または登録商標です。本プロジェクトは富士通株式会社とは一切関係ありません。
+
 # 4. 参考リンク
 
 - CMOC 公式: <http://sarrazip.com/dev/cmoc.html>
