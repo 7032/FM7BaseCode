@@ -2,6 +2,15 @@
 
 本ファイルは FM7BaseCode の主要な変更点を記録します。 書式は [Keep a Changelog](https://keepachangelog.com/ja/) に準拠し、 プロジェクトに版番号が無いため、 見出しは日付ベース (新しい順) で記載します。
 
+## 2026-07-17
+
+### Added
+- **機能デモ集 `functest/` を追加**: 本テンプレートとは独立に単体で起動する機能デモを収録。 第 1 弾としてマウスカーソルデモ ([functest/mouse/](functest/mouse/)) を追加 (バスマウス / インテリジェントマウス両対応、 画面モード切替ボタン付き、 FM-7 / FM77AV / FM77AV40 / FM77AV40EX 対応)。 同梱の `mousedemo.d77` がそのまま起動でき、 ソースからの再ビルドは各デモのディレクトリで `make` (lwtools の LWASM に加えて **Node.js** が必要。 ディスクイメージ組み立ての `mkd77.mjs` が Node.js 上で動作するため)
+- functest のヘッドレステストは公開エミュレータ core ([WebM7](https://github.com/7032/WebM7)) 上で実行する方式。 core の場所を環境変数 `WEBM7_DIR`、 ROM の場所を `FM7_ROM_DIR` で指定する (見つからない場合はエラーにならずスキップして正常終了)
+
+### Docs
+- README に「4. 機能デモ集 (functest/)」の節を新設し、 functest/ と各デモの README への導線を追加
+
 ## 2026-06-28
 
 ### Added
