@@ -113,7 +113,7 @@ make clean
 
 | 環境変数 | 内容 |
 |---------|------|
-| `WEBM7_DIR` | [WebM7](https://github.com/7032/WebM7) のディレクトリ (`core/fm7.js` を含む)。未指定時はリポジトリ同梱の `vendor/WebM7` (git submodule) を探します |
+| `WEBM7_DIR` | [WebM7](https://github.com/7032/WebM7) のディレクトリ (`core/fm7.js` を含む)。未指定時はリポジトリ直下の `vendor/WebM7` ディレクトリがあればそれを使います |
 | `FM7_ROM_DIR` | ROM 一式のディレクトリ。`fm7/` (boot_bas / boot_dos / subsys_c) と `fm77av/` (fbasic30 / subsys_a / subsys_b / initiate) のサブディレクトリを持つこと |
 
 ```

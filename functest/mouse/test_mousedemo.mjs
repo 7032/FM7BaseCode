@@ -19,8 +19,8 @@
 // JS 側で完全再現し、各モードの全プレーンをバイト単位で照合する。
 //
 // 使い方: node test_mousedemo.mjs
-//   エミュレータ core は環境変数 WEBM7_DIR で指定 (既定はリポジトリ同梱の
-//   vendor/WebM7 submodule)。見つからない場合はスキップして正常終了する。
+//   エミュレータ core は環境変数 WEBM7_DIR で指定 (未指定時はリポジトリ直下の
+//   vendor/WebM7 を探す)。見つからない場合はスキップして正常終了する。
 //   ROM は環境変数 FM7_ROM_DIR で指定 (fm7/ と fm77av/ のサブディレクトリを
 //   持つこと)。未設定・不在の場合もスキップして正常終了する。
 //   スクリーンショット (PPM) は環境変数 MOUSEDEMO_OUTDIR (既定 ./out) へ出力。
@@ -64,14 +64,14 @@ class CanvasShim {
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 // ---- 公開エミュレータ core (WebM7) の解決 ----
-//   WEBM7_DIR で明示指定。未指定時はリポジトリ同梱の vendor/WebM7 (git
-//   submodule) を探す。見つからなければテストをスキップして正常終了する。
+//   WEBM7_DIR で明示指定。未指定時はリポジトリ直下の vendor/WebM7 を探す。
+//   見つからなければテストをスキップして正常終了する。
 const WEBM7_CANDIDATES = process.env.WEBM7_DIR
     ? [process.env.WEBM7_DIR]
     : [join(HERE, '../../../vendor/WebM7'), join(HERE, '../../vendor/WebM7')];
 const WEBM7_DIR = WEBM7_CANDIDATES.find(d => existsSync(join(d, 'core', 'fm7.js')));
 if (!WEBM7_DIR) {
-    console.log('SKIP: WebM7 core が見つからないためスキップ (WEBM7_DIR を設定するか git submodule update --init を実行してください)');
+    console.log('SKIP: WebM7 core が見つからないためスキップ (WEBM7_DIR を設定するか vendor/WebM7 に配置してください)');
     process.exit(0);
 }
 const { FM7 } = await import(pathToFileURL(join(WEBM7_DIR, 'core', 'fm7.js')).href);
