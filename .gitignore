@@ -17,3 +17,5 @@ __pycache__/
 .DS_Store
 Thumbs.db
 ._*
+# ヘッドレステストの出力 (スクリーンショット / 音声)
+out/
