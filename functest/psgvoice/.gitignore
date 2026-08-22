@@ -1,0 +1,7 @@
+# ビルド中間物 (= make で再生成されるので git track しない)
+psgdata.bin
+psgvoice_main.bin
+psgvoice_sub.bin
+
+# ヘッドレス検証の出力 (スクリーンショット / 音声)
+out/
