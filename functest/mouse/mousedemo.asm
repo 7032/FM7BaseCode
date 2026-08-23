@@ -51,7 +51,7 @@
 
         org     $0100
 
-; ---- 共有RAM メールボックス (メイン側アドレス、サブ側は $D380- に対応) ----
+; ---- 共有RAM 受け渡し領域 (メイン側アドレス、サブ側は $D380- に対応) ----
 SH_CMD  equ     $FC82           ; サブモニタコマンドバイト
 SH_SEQ  equ     $FC83           ; 更新カウンタ
 SH_XH   equ     $FC84           ; カーソルX座標 (16ビット)
@@ -291,7 +291,7 @@ WACK:   lbsr    DLYS            ; サブに実行時間を与える
 WNOT:   lbsr    HALTOFF
         lbra    WACK
 
-        ; ---- 共有RAM メールボックス初期化 + 起動コマンド (HALT中に書く) ----
+        ; ---- 共有RAM 受け渡し領域初期化 + 起動コマンド (HALT中に書く) ----
 TKDONE: lbsr    READALL         ; 初期生値を読む (メインI/Oのみ。HALT不要)
         lbsr    HALTON
         ldd     #320

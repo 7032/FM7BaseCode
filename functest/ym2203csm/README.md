@@ -369,7 +369,7 @@ python3 scripts/png2fm77av.py --input assets/FM77AV.PNG \
 | `$D380`-`$D3FF` | 共有 RAM |
 | `$D800`-`$DFFF` | CG ROM (8x8 フォント) |
 
-### 共有 RAM メールボックス
+### 共有 RAM 受け渡し領域
 
 | メイン | サブ | 内容 |
 |--------|------|------|

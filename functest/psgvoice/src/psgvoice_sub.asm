@@ -21,7 +21,7 @@
 
         org     $C100
 
-; ---- 共有RAM メールボックス (サブ側アドレス) ----
+; ---- 共有RAM 受け渡し領域 (サブ側アドレス) ----
 SH_SEQ  equ     $D383           ; 更新カウンタ (メインが指示の度に +1)
 SH_REQ  equ     $D39D           ; リクエスト (1=HIT SPACE KEY / 2=FM-7 PSG!)
 SH_RACK equ     $D39E           ; リクエスト ack (処理した SH_SEQ を返す)
